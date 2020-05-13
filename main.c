@@ -122,7 +122,6 @@ float quadgramScore(char *message) {
     double score = 0;
     int i, key;
     char buff[5];
-    //memset(buff, '\0', sizeof(buff)); // Ensure terminating character at end of buff
     for(i = 0; i < (strlen(message)-3); i++) { // Loop through the array to the length of the message minus the length of an ngram minus 1
         strncpy(buff, &message[i], 4); // Gets current ngram e.g if message was "THIS IS A MESSAGE" we first get "THIS" then "HIS " then " IS " etc
         if((key = hash(buff)) == -1) {
