@@ -4,12 +4,13 @@
 #include <math.h>
 #include <time.h>
 
+#define MAX 456976 // 26^4 i.e space for every possible four letter word
 typedef struct WordFrequency {
     const char word[5];
     float frequency;
 } wordFreq;  
 
-wordFreq wordFreqs[456976]; // 26^4 i.e space for every possible four letter word
+wordFreq wordFreqs[MAX];
 float flor;
 
 int hash(char *input) { // Treat the four letter quadgrams as base 26 numbers. We can find a hash code for every quadgram that way
