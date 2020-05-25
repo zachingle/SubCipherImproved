@@ -86,7 +86,7 @@ void openAndAssignQuadgrams() {
     } else
         printf("Opened english_quadgrams.txt\n");
 
-    while((ch = fgetc(quadgramsFile)) != EOF) { // Loop to count the number of lines in the file to create arrays
+    while((ch = fgetc(quadgramsFile)) != EOF) {
         if(ch == '\n')
             lines++;
     } rewind(quadgramsFile);
