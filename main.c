@@ -22,9 +22,10 @@ int hash(char *input) { // Treat the four letter quadgrams as base 26 numbers. W
             return -1;
         }
     }
-    return key - 18278;
+    return key - 18278; // Take away the sum of the first quadgram as a hash e.g AAAA is equal to 18278. If we take that number away we can start at 1 and not 18278
 }
 
+// Shuffle all the characters in a given input string
 void shuffle(char *input) {
     int i, j, len = strlen(input);;
     char temp;
@@ -36,6 +37,7 @@ void shuffle(char *input) {
     }
 }
 
+// Decipher the given input string with a given key
 void decipher(char *input, char *key) {
     char alpha[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     int i, j, lenI = strlen(input), lenK = strlen(key);
@@ -49,6 +51,7 @@ void decipher(char *input, char *key) {
     }
 }
 
+// Randomly swap two characters in an input string
 void swap(char *input) {
     char temp;
     int a, b;
@@ -59,6 +62,7 @@ void swap(char *input) {
     input[b] = temp;
 }
 
+// Turn all lowercase letters to uppercase in an input string
 void upper(char *input) {
     int i, len = strlen(input);
     for(i = 0; i < len; i++) {
@@ -67,6 +71,7 @@ void upper(char *input) {
     }
 }
 
+// Open the english_quadgrams.txt and assigns the quadgrams to a global array
 void openAndAssignQuadgrams() {
     int i = 0, lines = 0, key, max = pow(26, 4);
     unsigned int N = 0;
@@ -89,7 +94,7 @@ void openAndAssignQuadgrams() {
     i = 0;
     while(i < lines) {
         fscanf(quadgramsFile, "%s %f\n", &buff, &freq);
-        key = hash(buff);
+        key = hash(buff); // Find the corresponding hash for the quadgram e.g. AAAA = 1, AAAB = 2, ..., ZZZZ = 456976
         if(key == -1) {
             printf("Incorrect quadgram: %s at line: %d", buff, i);
             exit(0);
@@ -118,7 +123,7 @@ void openAndAssignQuadgrams() {
     fclose(quadgramsFile);
 }
 
-
+// Finds the fitness of a given message
 float quadgramScore(char *message) {
     double score = 0;
     int i, key;
@@ -126,9 +131,9 @@ float quadgramScore(char *message) {
     for(i = 0; i < (strlen(message)-3); i++) { // Loop through the array to the length of the message minus the length of an ngram minus 1
         strncpy(buff, &message[i], 4); // Gets current ngram e.g if message was "THIS IS A MESSAGE" we first get "THIS" then "HIS " then " IS " etc
         if((key = hash(buff)) == -1) {
-            score += flor;
+            score += flor; // Default value if an ngram can't be found
         } else {
-            score += wordFreqs[key].frequency;
+            score += wordFreqs[key].frequency; // Corresponding frequency score of the ngram
         }
     }
     return score;
@@ -146,11 +151,11 @@ void subCipher(char *message, char *outputMessage) {
     int count, i = 0, newBestIndex = 0;
 
     begin = clock(); // Flag for time
-    while(i < 100) {
+    while(1) {
         t = clock(); // Flag for time
-        printf("\r%.2f%% done", (((float)i)/100)*100);
-        fflush(stdout);
         i++;
+        printf("%d Reshuffle\n", i);
+        fflush(stdout);
         strcpy(testText, message); // Copies message to testText
 
         shuffle(parentKey); // Randomly shuffle the key
@@ -160,7 +165,7 @@ void subCipher(char *message, char *outputMessage) {
         strcpy(message, testText); // Resets message back to original version as decipher() directly changes string
 
         count = 0;
-        while(count < 500) {
+        while(count < 1000) {
             strcpy(lastText, testText); // Used for resetting testText every iteration
 
             strcpy(childKey, parentKey);
@@ -179,7 +184,7 @@ void subCipher(char *message, char *outputMessage) {
         }
         if(score > maxScore) {
             time_taken = ((double)t)/CLOCKS_PER_SEC; // calculate the elapsed time
-            printf("\nTaken %f seconds so far\n", time_taken);
+            printf("Taken %f seconds so far\n", time_taken);
 
             newBestIndex = i;
             maxScore = score; // Set new high score ot maxScore
@@ -195,7 +200,7 @@ void subCipher(char *message, char *outputMessage) {
         }
 
         if(i - newBestIndex > 15) { // Checks if no new best iteration in last 10
-            printf("\nNo new iteration found in last 15. Skipping to end!");
+            printf("\nNo new best iteration found in last 15. Stopping the loop!");
             break;
         }
     }
@@ -242,10 +247,7 @@ int main(){
         i++;
     }
 
-    printf("%d\n",strlen(message));
-    printf("key: %d\n", hash("ZZZZ"));
-
-    upper(message);
+    upper(message); // Ensure the input message is all uppercase
 
     subCipher(message, outputMessage);
 
